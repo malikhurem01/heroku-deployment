@@ -34,7 +34,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/api/v1")
-@CrossOrigin(origins = {"http://localhost:3000"})
+@CrossOrigin(origins = {"https://auction-app-internship-fr.herokuapp.com/"})
 @Slf4j
 public class AuthenticationController {
 

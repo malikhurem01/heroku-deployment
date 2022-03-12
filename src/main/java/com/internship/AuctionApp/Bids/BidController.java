@@ -12,19 +12,19 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/api/v1")
-@CrossOrigin(origins = {"http://localhost:3000"})
+@CrossOrigin(origins = {"https://auction-app-internship-fr.herokuapp.com/"})
 public class BidController {
 
     @Autowired
@@ -45,15 +45,12 @@ public class BidController {
         BidResponse bidResponse;
         if (bidsList.size() > 0) {
             latestBidderId = bidsList.get(bidsList.size() - 1).getUser_id().getUser_id();
-            float max = bidsList.get(0).getBid_price();
-            for (int i = 0; i < bidsList.size(); i++) {
-                if (max < bidsList.get(i).getBid_price()) {
-                    max = bidsList.get(i).getBid_price();
-                }
-            }
-            bidResponse = new BidResponse(latestBidderId, (int) max, bidsList.size());
+            double max = bidsList.stream()
+                    .mapToDouble(v -> v.getBid_price())
+                    .max().orElseThrow(NoSuchElementException::new);
+            bidResponse = new BidResponse(latestBidderId, (float) max, bidsList.size());
         } else {
-            bidResponse = new BidResponse(latestBidderId, (int) product.getStart_price(), 0);
+            bidResponse = new BidResponse(latestBidderId, product.getStart_price(), 0);
         }
         return new ResponseEntity<>(bidResponse, HttpStatus.OK);
     }
@@ -69,12 +66,7 @@ public class BidController {
         }
         final DecodedJWT decodedJWT = JWTDecode.verifyToken(request.getHeader(AUTHORIZATION));
         final String username = decodedJWT.getSubject();
-        User user = null;
-        try {
-            user = userServiceImpl.loadUserByUsername(username);
-        } catch (UsernameNotFoundException exc) {
-            return new ResponseEntity<>("Not authorized.", HttpStatus.UNAUTHORIZED);
-        }
+        User user = userServiceImpl.loadUserByUsername(username);
         if (user.getUser_id().equals(product.getUser_id())) {
             return new ResponseEntity<>("User can not bid on his own product.", HttpStatus.UNAUTHORIZED);
         }
@@ -90,7 +82,7 @@ public class BidController {
         final Timestamp created_at = new Timestamp(System.currentTimeMillis());
         final Bid bid = new Bid(user, product, bidCreateRequest.getBid_price(), created_at);
         try {
-            bidServiceImpl.saveBid(bid);
+            bidServiceImpl.createBid(bid);
         } catch (Exception exception) {
             return new ResponseEntity<>("Server error.", HttpStatus.SERVICE_UNAVAILABLE);
         }

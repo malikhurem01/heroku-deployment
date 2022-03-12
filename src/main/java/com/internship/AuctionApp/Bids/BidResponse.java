@@ -6,7 +6,7 @@ public class BidResponse {
     private float highestBid;
     private int numberOfBids;
 
-    public BidResponse(Long latest_bidder_id, int highestBid, int numberOfBids) {
+    public BidResponse(Long latest_bidder_id, float highestBid, int numberOfBids) {
         this.latest_bidder_id = latest_bidder_id;
         this.highestBid = highestBid;
         this.numberOfBids = numberOfBids;
