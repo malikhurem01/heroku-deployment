@@ -56,13 +56,7 @@ public class AuthenticationController {
         final DecodedJWT decodedJWT = JWTDecode.verifyToken(request.getHeader(AUTHORIZATION));
         final String username = decodedJWT.getSubject();
         User user = null;
-        try {
-            user = userServiceImpl.loadUserByUsername(username);
-        } catch (UsernameNotFoundException exc) {
-            logger.error(exc.getMessage());
-            return ResponseEntity.badRequest().build();
-        }
-
+        user = userServiceImpl.loadUserByUsername(username);
         return ResponseEntity.ok().body(new AuthenticationResponse(user));
     }
 
