@@ -20,7 +20,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @RestController
 @RequestMapping(path = "/api/v1")
-@CrossOrigin(origins = {"http://localhost:3000", "https://auction-app-internship-fr.herokuapp.com/"})
+@CrossOrigin(origins = {"http://localhost:3000", "https://auction-app-internship-fr.herokuapp.com/", "https://auction-app-fr.herokuapp.com/"})
 public class BidController {
 
     private final static Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
